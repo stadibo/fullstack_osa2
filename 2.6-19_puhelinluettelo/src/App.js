@@ -64,29 +64,32 @@ class App extends React.Component {
     render() {
         const filteredPersons = (
             this.state.persons
-            .filter(p => p.name.toLowerCase()
-            .includes(this.state.filter.toLowerCase()))
+                .filter(p => p.name.toLowerCase()
+                    .includes(this.state.filter.toLowerCase()))
         )
         return (
             <div>
                 <h2>Puhelinluettelo</h2>
                 <div>
-                    rajaa näytettäviä: <input
+                    <InputField
+                        text="Rajaa näytettäviä"
                         value={this.state.filter}
-                        onChange={this.handleFilterChange}
+                        handler={this.handleFilterChange}
                     />
                 </div>
                 <form onSubmit={this.addPerson}>
                     <div>
-                        nimi: <input
+                        <InputField
+                            text="Nimi"
                             value={this.state.newName}
-                            onChange={this.handleNameChange}
+                            handler={this.handleNameChange}
                         />
                     </div>
                     <div>
-                        numero: <input
+                        <InputField
+                            text="Numero"
                             value={this.state.newNumber}
-                            onChange={this.handleNumberChange}
+                            handler={this.handleNumberChange}
                         />
                     </div>
                     <div>
@@ -95,14 +98,25 @@ class App extends React.Component {
                 </form>
                 <div>
                     <h2>Numerot</h2>
-                    <Numbers persons={filteredPersons} />
+                    <Persons persons={filteredPersons} />
                 </div>
             </div>
         )
     }
 }
 
-const Numbers = ({ persons }) => {
+const InputField = ({ handler, value, text }) => {
+    return (
+        <div>
+            {text}: <input
+                value={value}
+                onChange={handler}
+            />
+        </div>
+    )
+}
+
+const Persons = ({ persons }) => {
     return (
         <table>
             <tbody>
