@@ -5,7 +5,7 @@ class App extends React.Component {
         super(props)
         this.state = {
             persons: [
-                { 
+                {
                     name: 'Arto Hellas',
                     id: 1
                 }
@@ -21,16 +21,20 @@ class App extends React.Component {
             id: this.state.persons.length + 1
         }
 
-        const persons = this.state.persons.concat(personObject)
+        if (!this.state.persons.map(p => p.name).includes(this.state.newName)) {
+            const persons = this.state.persons.concat(personObject)
 
-        this.setState({
-            persons,
-            newName: ''
-        })
+            this.setState({
+                persons,
+                newName: ''
+            })
+        } else {
+            alert('Henkilö jo lisätty')
+        }
     }
 
     handleNameChange = (event) => {
-        this.setState({ newName: event.target.value})
+        this.setState({ newName: event.target.value })
     }
 
     render() {
@@ -49,8 +53,8 @@ class App extends React.Component {
                     </div>
                 </form>
                 <div>
-                <h2>Numerot</h2>
-                    <Numbers persons={this.state.persons}/>
+                    <h2>Numerot</h2>
+                    <Numbers persons={this.state.persons} />
                 </div>
             </div>
         )
@@ -58,7 +62,7 @@ class App extends React.Component {
 }
 
 const Numbers = ({ persons }) => {
-    return persons.map(p => <Person key={p.id} name={p.name}/>)
+    return persons.map(p => <Person key={p.id} name={p.name} />)
 }
 
 const Person = ({ name }) => {
