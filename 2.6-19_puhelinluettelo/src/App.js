@@ -7,10 +7,22 @@ class App extends React.Component {
             persons: [
                 {
                     name: 'Arto Hellas',
+                    number: '040-123456',
                     id: 1
-                }
+                },
+                {
+                    name: 'Martti Tienari', 
+                    number: '040-123456',
+                    id: 2
+                },
+                {
+                    name: 'Arto Järvinen', 
+                    number: '040-123456',
+                    id: 3
+                },
             ],
-            newName: ''
+            newName: '',
+            newNumber: ''
         }
     }
 
@@ -18,6 +30,7 @@ class App extends React.Component {
         event.preventDefault()
         const personObject = {
             name: this.state.newName,
+            number: this.state.newNumber,
             id: this.state.persons.length + 1
         }
 
@@ -26,7 +39,9 @@ class App extends React.Component {
 
             this.setState({
                 persons,
-                newName: ''
+                newName: '',
+                newNumber: ''
+
             })
         } else {
             alert('Henkilö jo lisätty')
@@ -35,6 +50,10 @@ class App extends React.Component {
 
     handleNameChange = (event) => {
         this.setState({ newName: event.target.value })
+    }
+
+    handleNumberChange = (event) => {
+        this.setState({ newNumber: event.target.value })
     }
 
     render() {
@@ -46,6 +65,12 @@ class App extends React.Component {
                         nimi: <input
                             value={this.state.newName}
                             onChange={this.handleNameChange}
+                        />
+                    </div>
+                    <div>
+                        numero: <input
+                            value={this.state.newNumber}
+                            onChange={this.handleNumberChange}
                         />
                     </div>
                     <div>
@@ -62,11 +87,22 @@ class App extends React.Component {
 }
 
 const Numbers = ({ persons }) => {
-    return persons.map(p => <Person key={p.id} name={p.name} />)
+    return (
+        <table>
+            <tbody>
+                {persons.map(p => <Person key={p.id} person={p} />)}
+            </tbody>
+        </table>
+    )
 }
 
-const Person = ({ name }) => {
-    return <p>{name}</p>
+const Person = ({ person }) => {
+    return (
+        <tr>
+            <td>{person.name}</td>
+            <td>{person.number}</td>
+        </tr>
+    )
 }
 
 export default App
