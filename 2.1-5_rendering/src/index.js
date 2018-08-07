@@ -18,7 +18,7 @@ const App = () => {
                 tehtavia: 14
             },
             {
-                nimi: 'Komponenttien tila dos',
+                nimi: 'Scrubs',
                 tehtavia: 11
             },
         ]
@@ -36,6 +36,7 @@ const Kurssi = ({ kurssi }) => {
         <div>
             <Otsikko nimi={kurssi.nimi}/>
             <Sisalto osat={kurssi.osat}/>
+            <Yhteensa osat={kurssi.osat} />
         </div>
     )
 }
@@ -58,17 +59,15 @@ const Osa = ({ content }) => {
     )
 }
 
+const Yhteensa = ({ osat }) => {
+    let maara = osat.reduce((tot, osa) => tot + osa.tehtavia, 0)
+    return (
+        <p>yhteensä {maara} tehtävää</p>
+    )
+}
+
 ReactDOM.render(
   <App />,
   document.getElementById('root')
 )
 
-// const Yhteensa = (props) => {
-//     return (
-//         <p>yhteensä {props.osat[0].tehtavia + 
-//             props.osat[1].tehtavia + 
-//             props.osat[2].tehtavia} tehtävää</p>
-//     )
-// }
-
-//<Yhteensa osat={kurssi.osat} />
