@@ -16,7 +16,11 @@ const App = () => {
             {
                 nimi: 'Komponenttien tila',
                 tehtavia: 14
-            }
+            },
+            {
+                nimi: 'Komponenttien tila dos',
+                tehtavia: 11
+            },
         ]
     }
 
@@ -44,17 +48,13 @@ const Otsikko = ({ nimi }) => {
 
 const Sisalto = ({ osat }) => {
     return (
-        <div>
-            <Osa osa={osat[0]} />
-            <Osa osa={osat[1]} />
-            <Osa osa={osat[2]} />
-        </div>
+        osat.map((osa, i) => <Osa key={i} content={osa}/>)
     )
 }
 
-const Osa = (props) => {
+const Osa = ({ content }) => {
     return (
-        <p>{props.osa.nimi} {props.osa.tehtavia}</p>
+        <p>{content.nimi} {content.tehtavia}</p>
     )
 }
 
