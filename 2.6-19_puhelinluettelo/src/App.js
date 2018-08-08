@@ -29,7 +29,12 @@ class App extends React.Component {
             number: this.state.newNumber,
         }
 
-        if (!this.state.persons.map(p => p.name).includes(this.state.newName)) {
+        if (this.state.persons.map(p => p.name).includes(this.state.newName)) {
+            let toReplace = window.confirm('Henkilö jo luettelossa, korvataanko vanha numero uudella?')
+            if (toReplace) {
+                this.updatePerson()
+            }
+        } else {
             personService
                 .create(personObject)
                 .then(newPerson => {
@@ -39,15 +44,27 @@ class App extends React.Component {
                         newNumber: ''
                     })
                 })
-        } else {
-            alert('Henkilö jo lisätty')
         }
+    }
+
+    updatePerson = () => {
+        const person = this.state.persons.find(p => p.name === this.state.newName)
+        const changedPerson = { ...person, number: this.state.newNumber }
+        const id = person.id
+
+        personService
+            .update(id, changedPerson)
+            .then(updatedPerson => {
+                this.setState({
+                    persons: this.state.persons.map(p => p.id !== id ? p : updatedPerson)
+                })
+            })
     }
 
     removePerson = (id) => () => {
         let pers = this.state.persons.find(p => p.id === id)
         let toDelete = window.confirm(`Poistetaanko ${pers.name}`)
-        if (toDelete)
+        if (toDelete) {
             personService
                 .del(id)
                 .then(response => {
@@ -55,7 +72,7 @@ class App extends React.Component {
                         persons: this.state.persons.filter(p => p.id !== id)
                     })
                 })
-        console.log('deleted')
+        }
     }
 
     handleNameChange = (event) => {
