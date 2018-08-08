@@ -1,6 +1,7 @@
 import React from 'react'
 import personService from './services/persons'
 
+
 class App extends React.Component {
     constructor(props) {
         super(props)
@@ -8,7 +9,9 @@ class App extends React.Component {
             persons: [],
             newName: '',
             newNumber: '',
-            filter: ''
+            filter: '',
+            message: null,
+            errorType: null
         }
     }
 
@@ -35,16 +38,26 @@ class App extends React.Component {
                 this.updatePerson()
             }
         } else {
-            personService
-                .create(personObject)
-                .then(newPerson => {
-                    this.setState({
-                        persons: this.state.persons.concat(newPerson),
-                        newName: '',
-                        newNumber: ''
-                    })
-                })
+            this.addNewPerson(personObject)
         }
+
+    }
+
+    addNewPerson = (person) => {
+        personService
+            .create(person)
+            .then(newPerson => {
+                this.setState({
+                    persons: this.state.persons.concat(newPerson),
+                    newName: '',
+                    newNumber: '',
+                    errorType: "success",
+                    message: `lisättiin ${newPerson.name}`
+                })
+                setTimeout(() => {
+                    this.setState({ errorType: null })
+                }, 5000)
+            })
     }
 
     updatePerson = () => {
@@ -56,8 +69,21 @@ class App extends React.Component {
             .update(id, changedPerson)
             .then(updatedPerson => {
                 this.setState({
-                    persons: this.state.persons.map(p => p.id !== id ? p : updatedPerson)
+                    persons: this.state.persons.map(p => p.id !== id ? p : updatedPerson),
+                    newName: '',
+                    newNumber: '',
+                    errorType: "success",
+                    message: `päivitettiin ${updatedPerson.name}`
                 })
+                setTimeout(() => {
+                    this.setState({ errorType: null })
+                }, 5000)
+            }).catch(error => {
+                let toAdd = window.confirm('Henkilö jo poistettu luettelosta, lisäätäänkö henkilö?')
+                if (toAdd) {
+                    this.setState({ persons: this.state.persons.filter(p => p.id !== id) })
+                    this.addNewPerson(changedPerson)
+                }
             })
     }
 
@@ -69,10 +95,18 @@ class App extends React.Component {
                 .del(id)
                 .then(response => {
                     this.setState({
-                        persons: this.state.persons.filter(p => p.id !== id)
+                        persons: this.state.persons.filter(p => p.id !== id),
+                        errorType: "success",
+                        message: `poistettiin ${pers.name}`
                     })
+                    setTimeout(() => {
+                        this.setState({ errorType: null })
+                    }, 5000)
+                }).catch(error => {
+
                 })
         }
+
     }
 
     handleNameChange = (event) => {
@@ -95,7 +129,13 @@ class App extends React.Component {
         )
         return (
             <div>
-                <h2>Puhelinluettelo</h2>
+                <h1>Puhelinluettelo</h1>
+
+                <Notification
+                    message={this.state.message}
+                    type={this.state.errorType}
+                />
+
                 <div>
                     <InputField
                         text="Rajaa näytettäviä"
@@ -103,6 +143,8 @@ class App extends React.Component {
                         handler={this.handleFilterChange}
                     />
                 </div>
+
+                <h2>Lisää uusi</h2>
                 <form onSubmit={this.addPerson}>
                     <div>
                         <InputField
@@ -133,7 +175,7 @@ class App extends React.Component {
 
 const InputField = ({ handler, value, text }) => {
     return (
-        <div>
+        <div className="field">
             {text}: <input
                 value={value}
                 onChange={handler}
@@ -144,7 +186,7 @@ const InputField = ({ handler, value, text }) => {
 
 const Persons = ({ persons, handlePerson }) => {
     return (
-        <table>
+        <table className="persons">
             <tbody>
                 {persons.map(p => <Person key={p.id} person={p} handler={handlePerson(p.id)} />)}
             </tbody>
@@ -159,6 +201,17 @@ const Person = ({ person, handler }) => {
             <td>{person.number}</td>
             <td><button onClick={handler}>poista</button></td>
         </tr>
+    )
+}
+
+const Notification = ({ message, type }) => {
+    if (type === null) {
+        return null
+    }
+    return (
+        <div className={type}>
+            {message}
+        </div>
     )
 }
 
