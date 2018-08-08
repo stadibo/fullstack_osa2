@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from 'axios'
+import personService from './services/persons'
 
 class App extends React.Component {
     constructor(props) {
@@ -13,11 +13,11 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        axios
-            .get('http://localhost:3001/persons')
-            .then(response => {
+        personService
+            .getAll()
+            .then(persons => {
                 this.setState({
-                    persons: response.data
+                    persons
                 })
             })
     }
@@ -27,21 +27,35 @@ class App extends React.Component {
         const personObject = {
             name: this.state.newName,
             number: this.state.newNumber,
-            id: this.state.persons.length + 1
         }
 
         if (!this.state.persons.map(p => p.name).includes(this.state.newName)) {
-            const persons = this.state.persons.concat(personObject)
-
-            this.setState({
-                persons,
-                newName: '',
-                newNumber: ''
-
-            })
+            personService
+                .create(personObject)
+                .then(newPerson => {
+                    this.setState({
+                        persons: this.state.persons.concat(newPerson),
+                        newName: '',
+                        newNumber: ''
+                    })
+                })
         } else {
             alert('Henkilö jo lisätty')
         }
+    }
+
+    removePerson = (id) => () => {
+        let pers = this.state.persons.find(p => p.id === id)
+        let toDelete = window.confirm(`Poistetaanko ${pers.name}`)
+        if (toDelete)
+            personService
+                .del(id)
+                .then(response => {
+                    this.setState({
+                        persons: this.state.persons.filter(p => p.id !== id)
+                    })
+                })
+        console.log('deleted')
     }
 
     handleNameChange = (event) => {
@@ -93,7 +107,7 @@ class App extends React.Component {
                 </form>
                 <div>
                     <h2>Numerot</h2>
-                    <Persons persons={filteredPersons} />
+                    <Persons persons={filteredPersons} handlePerson={this.removePerson} />
                 </div>
             </div>
         )
@@ -111,21 +125,22 @@ const InputField = ({ handler, value, text }) => {
     )
 }
 
-const Persons = ({ persons }) => {
+const Persons = ({ persons, handlePerson }) => {
     return (
         <table>
             <tbody>
-                {persons.map(p => <Person key={p.id} person={p} />)}
+                {persons.map(p => <Person key={p.id} person={p} handler={handlePerson(p.id)} />)}
             </tbody>
         </table>
     )
 }
 
-const Person = ({ person }) => {
+const Person = ({ person, handler }) => {
     return (
         <tr>
             <td>{person.name}</td>
             <td>{person.number}</td>
+            <td><button onClick={handler}>poista</button></td>
         </tr>
     )
 }
